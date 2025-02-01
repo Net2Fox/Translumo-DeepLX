@@ -28,6 +28,29 @@ namespace Translumo.Utils.Http
             return result.ToString();
         }
 
+        public static string BuildJSONFormData<TEntity>(TEntity bodyEntity)
+            where TEntity : class
+        {
+            var result = new StringBuilder();
+            result.Append("{");
+            foreach (var propertyInfo in typeof(TEntity).GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance))
+            {
+                var value = propertyInfo.GetValue(bodyEntity)?.ToString();
+                if (value != null)
+                {
+                    result.Append($"\"{GetFormDataPropertyName(propertyInfo.Name)}\": \"{value}\"");
+                    result.Append(",");
+                }
+            }
+
+            if (result.Length > 0)
+            {
+                result.Remove(result.Length - 1, 1);
+            }
+            result.Append("}");
+            return result.ToString();
+        }
+
         public static string BuildQueryString<TEntity>(TEntity queryParamsEntity)
             where TEntity : class
         {
